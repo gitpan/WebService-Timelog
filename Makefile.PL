@@ -1,0 +1,11 @@
+use inc::Module::Install;
+name 'WebService-Timelog';
+all_from 'lib/WebService/Timelog.pm';
+license 'MIT';
+requires 'URI';
+requires 'LWP::UserAgent';
+requires 'XML::Simple';
+build_requires 'Test::More';
+use_test_base;
+auto_include;
+WriteAll;
