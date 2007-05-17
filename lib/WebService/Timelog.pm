@@ -8,7 +8,7 @@ use URI;
 use LWP::UserAgent;
 use XML::Simple qw(XMLin);
 
-our $VERSION  = '0.01';
+our $VERSION  = '0.02';
 
 sub new {
     my ($class, %conf) = @_;
@@ -33,33 +33,33 @@ sub new {
 sub ua { shift->{ua} }
 
 sub new_msg {
-    my ($self, $text) = @_;
-    return $self->_dispatch_request('post', 'new.asp', { text => $text });
+    my ($self, %args) = @_;
+    return $self->_dispatch_request('post', 'new.asp', \%args);
 }
 
 sub update {
     my ($self, $text) = @_;
-    return $self->new_msg($text);
+    return $self->new_msg(text => $text);
 }
 
 sub public_msg {
-    my ($self, $count) = @_;
-    return $self->_dispatch_request('get', 'public_msg.asp', { fmt => 'xml', cnt => $count });
+    my ($self, %args) = @_;
+    return $self->_dispatch_request('get', 'public_msg.asp', { %args, fmt => 'xml' });
 }
 
 sub friends_msg {
-    my ($self, $count) = @_;
-    return $self->_dispatch_request('get', 'friends_msg.asp', { fmt => 'xml', cnt => $count });
+    my ($self, %args) = @_;
+    return $self->_dispatch_request('get', 'friends_msg.asp', { %args, fmt => 'xml' });
 }
 
 sub direct_msg {
-    my ($self, $count) = @_;
-    return $self->_dispatch_request('get', 'direct_msg.asp', { fmt => 'xml', cnt => $count });
+    my ($self, %args) = @_;
+    return $self->_dispatch_request('get', 'direct_msg.asp', { %args, fmt => 'xml' });
 }
 
 sub friends {
-    my ($self, $count) = @_;
-    return $self->_dispatch_request('get', 'friends.asp', { fmt => 'xml', cnt => $count });
+    my ($self, %args) = @_;
+    return $self->_dispatch_request('get', 'friends.asp', { %args, fmt => 'xml' });
 }
 
 sub show {
@@ -108,22 +108,25 @@ WebService::Timelog - A Perl interface to Timelog API
   );
 
   # update status
-  $timelog->new_msg($text); # or $timelog->update($text);
+  $timelog->new_msg(text => $text);
+
+  # or you can do so like this
+  $timelog->update($text);
 
   # retrieve public messages
-  my $public_messages  = $timelog->public_msg($count);
+  my $public_messages  = $timelog->public_msg(cnt => $count, since => $since);
 
   # retrieve friends' messages
-  my $friends_messages = $timelog->friends_msg($count);
+  my $friends_messages = $timelog->friends_msg(cnt => $count, since => $since);
 
   # retrieve direct messages
-  my $direct_messages  = $timelog->direct_msg($count);
+  my $direct_messages  = $timelog->direct_msg(cnt => $count);
 
   # retrieve some information on you
-  my $me               = $timelog->show($count);
+  my $me               = $timelog->show();
 
   # retrieve some informtion on your friends
-  my $friends          = $timelog->friends($count);
+  my $friends          = $timelog->friends(cnt => $count);
 
 =head1 DESCRIPTION
 
@@ -151,13 +154,13 @@ croak immediately.
 
 =back
 
-=head2 new_msg ( I<$text> )
+=head2 new_msg ( I<%args> )
 
 =over 4
 
-  $timelog->new_msg($text);
+  $timelog->new_msg(text => $text);
 
-Updates your status with I<$text> passed in.
+Updates your status.
 
 Make sure that it will croak immediately, if request failed. It's also
 applicable to the methods described below.
@@ -170,36 +173,38 @@ applicable to the methods described below.
 
   $timelog->update($text);
 
-This method is an alias for new_msg() described above to make
+This method is an alias for new_msg() described above, but the
+argument takes a different form from new_msg(). It's to make
 consistent with the same name one of L<Net::Twitter>.
 
 =back
 
-=head2 public_msg ( I<$count> )
+=head2 public_msg ( I<%args> )
 
 =over 4
 
-  my $public_messages = $timelog->public_msg($count);
+  my $public_messages = $timelog->public_msg(cnt => $count, since => 200705170900);
 
-Retrieves Timelog messages in public.
+Retrieves Timelog messages in public. For more details, consult the
+official documentation of Timelog API.
 
 =back
 
-=head2 friends_msg ( I<$count> )
+=head2 friends_msg ( I<%args> )
 
 =over 4
 
-  my $friends_messages = $timelog->friends_msg($count);
+  my $friends_messages = $timelog->friends_msg(cnt => $count, since => 200705170900);
 
 Retrieves your friends' messages.
 
 =back
 
-=head2 direct_msg ( I<$count> )
+=head2 direct_msg ( I<%args> )
 
 =over 4
 
-  my $direct_messages = $timelog->direct_msg($count);
+  my $direct_messages = $timelog->direct_msg(cnt => $count);
 
 Retrieves direct messages sent to you.
 
@@ -215,11 +220,11 @@ Retrieve some information on you.
 
 =back
 
-=head2 friends ( I<$count> )
+=head2 friends ( I<%args> )
 
 =over 4
 
-  my $friends = $timelog->friends($count);
+  my $friends = $timelog->friends(cnt => $count);
 
 Retrieve some information on your friends.
 

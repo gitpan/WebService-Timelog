@@ -9,7 +9,6 @@ use warnings;
 use lib qw(lib);
 use Net::Twitter;
 use WebService::Timelog;
-use YAML;
 
 my $status = shift or die "Usage: $0 <status>";
 

@@ -1,5 +1,11 @@
 Revision history for Perl extension WebService::Timelog
 
+[Changes for 0.02 - Wed May 17 09:13:52 2007]
+
+* API CHANGE: Updated all methods except show() along with Timelog API
+  update. They now assume arguments are passed in as a hash.
+
+
 [Changes for 0.01 - Wed May 16 23:15:17 2007]
 
 * original version
