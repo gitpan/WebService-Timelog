@@ -8,7 +8,7 @@ use URI;
 use LWP::UserAgent;
 use XML::Simple qw(XMLin);
 
-our $VERSION  = '0.02';
+our $VERSION  = '0.03';
 
 sub new {
     my ($class, %conf) = @_;
@@ -45,6 +45,11 @@ sub update {
 sub public_msg {
     my ($self, %args) = @_;
     return $self->_dispatch_request('get', 'public_msg.asp', { %args, fmt => 'xml' });
+}
+
+sub tags {
+    my ($self, %args) = @_;
+    return $self->_dispatch_request('get', 'tags.asp', { %args, fmt => 'xml' });
 }
 
 sub friends_msg {
@@ -85,7 +90,7 @@ sub _dispatch_request {
     croak(sprintf "%s: %s", $res->code, $res->message)
         if $res->is_error;
 
-    return $method eq 'get' ? XMLin($res->content, ForceArray => [qw(entry)], KeyAttr => [qw(entry)])
+    return $method eq 'get' ? XMLin($res->content, ForceArray => [qw(entry tagdata)], KeyAttr => [qw(entry tagdata)])
                             : $res->content
                             ;
 }
@@ -115,6 +120,9 @@ WebService::Timelog - A Perl interface to Timelog API
 
   # retrieve public messages
   my $public_messages  = $timelog->public_msg(cnt => $count, since => $since);
+
+  # retrieve public tags
+  my $tags  = $timelog->tags();
 
   # retrieve friends' messages
   my $friends_messages = $timelog->friends_msg(cnt => $count, since => $since);
@@ -183,10 +191,23 @@ consistent with the same name one of L<Net::Twitter>.
 
 =over 4
 
-  my $public_messages = $timelog->public_msg(cnt => $count, since => 200705170900);
+  my $public_messages = $timelog->public_msg(
+      cnt   => $count,
+      since => 200705170900,
+  );
 
 Retrieves Timelog messages in public. For more details, consult the
 official documentation of Timelog API.
+
+=back
+
+=head2 tags ()
+
+=over 4
+
+  my $tags = $timelog->tags();
+
+Retrieves all the tags in public.
 
 =back
 
@@ -194,7 +215,10 @@ official documentation of Timelog API.
 
 =over 4
 
-  my $friends_messages = $timelog->friends_msg(cnt => $count, since => 200705170900);
+  my $friends_messages = $timelog->friends_msg(
+      cnt   => $count,
+      since => 200705170900,
+  );
 
 Retrieves your friends' messages.
 
