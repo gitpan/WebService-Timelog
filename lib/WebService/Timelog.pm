@@ -8,7 +8,7 @@ use URI;
 use LWP::UserAgent;
 use XML::Simple qw(XMLin);
 
-our $VERSION  = '0.03';
+our $VERSION  = '0.04';
 
 sub new {
     my ($class, %conf) = @_;
@@ -47,11 +47,6 @@ sub public_msg {
     return $self->_dispatch_request('get', 'public_msg.asp', { %args, fmt => 'xml' });
 }
 
-sub tags {
-    my ($self, %args) = @_;
-    return $self->_dispatch_request('get', 'tags.asp', { %args, fmt => 'xml' });
-}
-
 sub friends_msg {
     my ($self, %args) = @_;
     return $self->_dispatch_request('get', 'friends_msg.asp', { %args, fmt => 'xml' });
@@ -62,14 +57,24 @@ sub direct_msg {
     return $self->_dispatch_request('get', 'direct_msg.asp', { %args, fmt => 'xml' });
 }
 
-sub friends {
+sub my_msg {
     my ($self, %args) = @_;
-    return $self->_dispatch_request('get', 'friends.asp', { %args, fmt => 'xml' });
+    return $self->_dispatch_request('get', 'my_msg.asp', { %args, fmt => 'xml' });
+}
+
+sub tags {
+    my ($self, %args) = @_;
+    return $self->_dispatch_request('get', 'tags.asp', { %args, fmt => 'xml' });
 }
 
 sub show {
     my $self = shift;
     return $self->_dispatch_request('get', 'show.asp', { fmt => 'xml' });
+}
+
+sub friends {
+    my ($self, %args) = @_;
+    return $self->_dispatch_request('get', 'friends.asp', { %args, fmt => 'xml' });
 }
 
 sub _dispatch_request {
@@ -119,22 +124,35 @@ WebService::Timelog - A Perl interface to Timelog API
   $timelog->update($text);
 
   # retrieve public messages
-  my $public_messages  = $timelog->public_msg(cnt => $count, since => $since);
-
-  # retrieve public tags
-  my $tags  = $timelog->tags();
+  my $public_messages = $timelog->public_msg(
+      cnt   => $count,
+      since => $since,
+  );
 
   # retrieve friends' messages
-  my $friends_messages = $timelog->friends_msg(cnt => $count, since => $since);
+  my $friends_messages = $timelog->friends_msg(
+      cnt => $count,
+      since => $since,
+  );
 
   # retrieve direct messages
-  my $direct_messages  = $timelog->direct_msg(cnt => $count);
+  my $direct_messages = $timelog->direct_msg(cnt => $count);
+
+  # retrieve only your own messages
+  my $my_messages = $timelog->my_msg(
+      cnt   => $count,
+      stat  => $stat,
+      since => $since,
+  );
+
+  # retrieve public tags
+  my $tags = $timelog->tags();
 
   # retrieve some information on you
-  my $me               = $timelog->show();
+  my $me = $timelog->show();
 
   # retrieve some informtion on your friends
-  my $friends          = $timelog->friends(cnt => $count);
+  my $friends = $timelog->friends(cnt => $count);
 
 =head1 DESCRIPTION
 
@@ -193,21 +211,13 @@ consistent with the same name one of L<Net::Twitter>.
 
   my $public_messages = $timelog->public_msg(
       cnt   => $count,
-      since => 200705170900,
+      since => $since,
   );
 
-Retrieves Timelog messages in public. For more details, consult the
+Retrieves Timelog messages in public.
+
+For more details about how you can pass the arguments in, consult the
 official documentation of Timelog API.
-
-=back
-
-=head2 tags ()
-
-=over 4
-
-  my $tags = $timelog->tags();
-
-Retrieves all the tags in public.
 
 =back
 
@@ -217,7 +227,7 @@ Retrieves all the tags in public.
 
   my $friends_messages = $timelog->friends_msg(
       cnt   => $count,
-      since => 200705170900,
+      since => $since,
   );
 
 Retrieves your friends' messages.
@@ -234,13 +244,37 @@ Retrieves direct messages sent to you.
 
 =back
 
+=head2 my_msg ( I<%args> )
+
+=over 4
+
+  my $my_messages = $timelog->direct_msg(
+      cnt   => $count,
+      stat  => $stat,
+      since => $since,
+  );
+
+Retrieves only your own messages under some conditions.
+
+=back
+
+=head2 tags ()
+
+=over 4
+
+  my $tags = $timelog->tags();
+
+Retrieves all the tags in public.
+
+=back
+
 =head2 show ()
 
 =over 4
 
   my $me = $timelog->show();
 
-Retrieve some information on you.
+Retrieves some information on you.
 
 =back
 
@@ -250,7 +284,7 @@ Retrieve some information on you.
 
   my $friends = $timelog->friends(cnt => $count);
 
-Retrieve some information on your friends.
+Retrieves some information on your friends.
 
 =back
 
@@ -258,7 +292,7 @@ Retrieve some information on your friends.
 
 =over 4
 
-  $timelog->ua(timeout => 10);
+  $timelog->ua->timeout(10);
 
 This method returns LWP::UserAgent object internally used in the
 WebService::Timelog object. You can set some other options which are
