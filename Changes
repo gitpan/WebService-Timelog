@@ -1,5 +1,9 @@
 Revision history for Perl extension WebService::Timelog
 
+[Changes for 0.05 - Wed Jun 20 18:03:59 JST 2007]
+
+* Added res_msg() method to retrieve messages responded to you.
+
 [Changes for 0.04 - Thu May 31 14:38:44 JST 2007]
 
 * Added my_msg() method to retrieve only your own messages under some

@@ -8,7 +8,7 @@ use URI;
 use LWP::UserAgent;
 use XML::Simple qw(XMLin);
 
-our $VERSION  = '0.04';
+our $VERSION  = '0.05';
 
 sub new {
     my ($class, %conf) = @_;
@@ -60,6 +60,11 @@ sub direct_msg {
 sub my_msg {
     my ($self, %args) = @_;
     return $self->_dispatch_request('get', 'my_msg.asp', { %args, fmt => 'xml' });
+}
+
+sub res_msg {
+    my ($self, %args) = @_;
+    return $self->_dispatch_request('get', 'res_msg.asp', { %args, fmt => 'xml' });
 }
 
 sub tags {
@@ -144,6 +149,9 @@ WebService::Timelog - A Perl interface to Timelog API
       stat  => $stat,
       since => $since,
   );
+
+  # retrieve messages responded to you
+  my $response_messages = $timelog->res_msg(cnt => $count);
 
   # retrieve public tags
   my $tags = $timelog->tags();
@@ -248,13 +256,23 @@ Retrieves direct messages sent to you.
 
 =over 4
 
-  my $my_messages = $timelog->direct_msg(
+  my $my_messages = $timelog->my_msg(
       cnt   => $count,
       stat  => $stat,
       since => $since,
   );
 
 Retrieves only your own messages under some conditions.
+
+=back
+
+=head2 res_msg ( I<%args> )
+
+=over 4
+
+  my $response_messages = $timelog->res_msg(cnt => $count);
+
+Retrieves messages responded to you.
 
 =back
 
